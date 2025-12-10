@@ -3,9 +3,16 @@
   --bg: #f6fbf6;            /* page background */
   --card: #ffffff;          /* content card */
   --muted: #46614a;         /* subdued text (greenish) */
-  --text: #122015;          /* main text (dark) */
+  --text: #122015;         /* main text (dark) */
   --accent: #2f8f4a;        /* primary green */
   --accent-2: #7ed493;     /* secondary lighter green */
+
+  /* Global background image (appears behind everything) */
+  --global-bg-image: url("images/plant-bg.png"); /* update path if needed */
+  --global-bg-opacity: 0.50;    /* 0 = invisible, 1 = full */
+  /* --global-bg-blur: 2px;        make image slightly blurry for legibility */
+  --global-bg-scale: 1.08;      /* scale up slightly to avoid seams */
+  --global-bg-color: rgba(246,251,246,0.0); /* optional color overlay */
 
   --glass: rgba(47,143,74,0.06);
   --radius:12px;
@@ -23,15 +30,53 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 
+  /* Layout: align to top and allow scrolling when content is taller than viewport */
   display:flex;
   align-items:flex-start;
   justify-content:center;
   padding:32px;
   min-height:100vh;
   overflow:auto;
+  position:relative; /* stacking context for ::before (not strictly required) */
 }
 
-/* Container now hosts the decorative background via ::before */
+/* Global decorative background behind everything (shows through body padding) */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0; /* fill the viewport */
+  background-image: var(--global-bg-image);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: calc(100% * var(--global-bg-scale)) auto;
+  opacity: var(--global-bg-opacity);
+  filter: blur(var(--global-bg-blur)) saturate(1.05);
+  transform: translateZ(0);
+  pointer-events: none;   /* decorative only */
+  z-index: -1;            /* behind all content */
+  mix-blend-mode: normal; /* change to multiply/screen for different effects */
+}
+
+/* subtle overlay color if you want to tint the background */
+body::after{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--global-bg-color);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Optionally add a tiny parallax when scrolling (keeps subtle and optional) */
+@media (prefers-reduced-motion: no-preference) {
+  /* Small slow translate to create depth; safe and subtle */
+  body::before {
+    will-change: transform;
+    transform: translateY(calc(var(--scroll, 0px) * 0.02));
+  }
+}
+
+/* Container: keep as card but with slight transparency so background peeks through edges */
 .container{
   width:100%;
   max-width:var(--max-width);
@@ -45,32 +90,14 @@ body{
   max-height: calc(100vh - 64px);
   overflow:auto;
 
-  /* stacking context / positioning for pseudo-element */
   position:relative;
   isolation:isolate;
 }
 
-/* Decorative background behind content (clipped by container border-radius) */
-.container::before{
-  content: "";
-  position: absolute;
-  inset: 0;                  /* fill container */
-  border-radius: inherit;    /* match container rounding */
-  background-image: var(--bg-image);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: calc(100% * var(--bg-image-scale)) auto; /* scale slightly */
-  opacity: var(--bg-image-opacity);
-  filter: blur(var(--bg-image-blur)) saturate(1.05);
-  transform-origin: center;
-  pointer-events: none;      /* decorative only */
-  z-index: 0;
-}
-
-/* Ensure content sits above the pseudo-element */
+/* Content stacking so the body background sits behind everything */
 .container > *{
-  position: relative;
-  z-index: 1;
+  position:relative;
+  z-index:1;
 }
 
 .site-header{
@@ -204,9 +231,10 @@ body{
   .tabs{ padding-bottom:8px; }
   .tab{ flex:0 0 auto; }
   /* Optionally reduce or hide decorative background on small screens */
-  .container::before{
-    opacity: calc(var(--bg-image-opacity) * 0.7);
+  body::before{
+    opacity: calc(var(--global-bg-opacity) * 0.7);
     background-position: top center;
     background-size: cover;
+    filter: blur(calc(var(--global-bg-blur) * 1.2));
   }
 }
