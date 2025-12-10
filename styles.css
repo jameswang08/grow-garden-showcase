@@ -1,25 +1,26 @@
 :root{
+  /* Card size: change these to set the fixed card dimensions */
+  --card-width: 900px;    /* preferred fixed width */
+  --card-height: 720px;   /* preferred fixed height */
+
   /* Gardeny / light theme */
-  --bg: #f6fbf6;            /* page background */
-  --card: #ffffff;          /* content card */
-  --muted: #46614a;         /* subdued text (greenish) */
-  --text: #122015;         /* main text (dark) */
-  --accent: #2f8f4a;        /* primary green */
-  --accent-2: #7ed493;     /* secondary lighter green */
+  --bg: #f6fbf6;
+  --card: #ffffff;
+  --muted: #46614a;
+  --text: #122015;
+  --accent: #2f8f4a;
+  --accent-2: #7ed493;
 
-  /* Global background image (appears behind everything) */
-  --global-bg-image: url("images/plant-bg.png"); /* update path if needed */
-  --global-bg-opacity: 0.50;    /* 0 = invisible, 1 = full */
-  /* --global-bg-blur: 2px;        make image slightly blurry for legibility */
-  --global-bg-scale: 1.08;      /* scale up slightly to avoid seams */
-  --global-bg-color: rgba(246,251,246,0.0); /* optional color overlay */
+  --global-bg-image: url("images/plant-bg.png");
+  --global-bg-opacity: 0.50;
+  --global-bg-scale: 1.08;
 
-  --glass: rgba(47,143,74,0.06);
   --radius:12px;
   --max-width:980px;
   --shadow: 0 8px 30px rgba(18,32,18,0.08);
 }
 
+/* base reset */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -30,82 +31,64 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 
-  /* Layout: align to top and allow scrolling when content is taller than viewport */
+  /* center the fixed-size card; if viewport is too small the card will clamp */
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:center;
   padding:32px;
   min-height:100vh;
   overflow:auto;
-  position:relative; /* stacking context for ::before (not strictly required) */
+  position:relative;
 }
 
-/* Global decorative background behind everything (shows through body padding) */
+/* global decorative background (behind padding and card) */
 body::before{
   content: "";
   position: fixed;
-  inset: 0; /* fill the viewport */
+  inset: 0;
   background-image: var(--global-bg-image);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: calc(100% * var(--global-bg-scale)) auto;
   opacity: var(--global-bg-opacity);
   filter: blur(var(--global-bg-blur)) saturate(1.05);
-  transform: translateZ(0);
-  pointer-events: none;   /* decorative only */
-  z-index: -1;            /* behind all content */
-  mix-blend-mode: normal; /* change to multiply/screen for different effects */
-}
-
-/* subtle overlay color if you want to tint the background */
-body::after{
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: var(--global-bg-color);
   pointer-events: none;
   z-index: -1;
 }
 
-/* Optionally add a tiny parallax when scrolling (keeps subtle and optional) */
-@media (prefers-reduced-motion: no-preference) {
-  /* Small slow translate to create depth; safe and subtle */
-  body::before {
-    will-change: transform;
-    transform: translateY(calc(var(--scroll, 0px) * 0.02));
-  }
-}
-
-/* Container: keep as card but with slight transparency so background peeks through edges */
+/* CARD — fixed-preferred size with safe clamps for small screens */
 .container{
-  width:100%;
-  max-width:var(--max-width);
+  /* preferred fixed dimensions */
+  width: var(--card-width);
+  height: var(--card-height);
+
+  /* safety: never overflow viewport — on small screens these clamp down */
+  max-width: calc(100% - 64px);   /* 32px page padding each side */
+  max-height: calc(100vh - 64px); /* 32px top/bottom padding */
+
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.96));
   border-radius:16px;
   padding:28px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(4px);
 
-  /* Prevent the card from growing beyond viewport height; make it scroll internally */
-  max-height: calc(100vh - 64px);
+  /* make the card scroll internally when content exceeds height */
   overflow:auto;
 
   position:relative;
   isolation:isolate;
 }
 
-/* Content stacking so the body background sits behind everything */
-.container > *{
-  position:relative;
-  z-index:1;
-}
+/* ensure children render above background */
+.container > *{ position:relative; z-index:1; }
 
+/* header */
 .site-header{
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
   gap:16px;
-  margin-bottom:20px;
+  margin-bottom:16px;
   flex-wrap:wrap;
 }
 
@@ -116,38 +99,26 @@ body::after{
   letter-spacing:0.2px;
   color:var(--text);
 }
+.site-sub{ margin:4px 0 0 0; color:var(--muted); font-size:13px; }
 
-.site-sub{
-  margin:4px 0 0 0;
-  color:var(--muted);
-  font-size:13px;
-}
-
-/* Tabs: never wrap, allow horizontal scroll, smooth scrolling on touch */
-/* Added padding-top so focus outlines / shadows have breathing room (prevents truncation) */
+/* Tabs row */
 .tabs{
   display:flex;
   gap:8px;
-  flex-wrap:nowrap;         /* prevent wrapping */
-  overflow-x:auto;          /* horizontal scroll */
+  flex-wrap:nowrap;
+  overflow-x:auto;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;  /* smooth scroll for scrollIntoView */
+  scroll-behavior: smooth;
   align-items:center;
-  padding-top:8px;          /* room above tabs to avoid outline/shadow clipping */
-  padding-bottom:6px;       /* space under scroll area for touch */
-  margin-bottom:18px;
+  padding-top:8px;
+  padding-bottom:6px;
+  margin-bottom:14px;
   position:relative;
   z-index:1;
 }
-
-/* Subtle scrollbar for tabs */
 .tabs::-webkit-scrollbar{ height:8px }
-.tabs::-webkit-scrollbar-thumb{
-  background: rgba(34, 77, 44, 0.12);
-  border-radius:999px;
-}
+.tabs::-webkit-scrollbar-thumb{ background: rgba(34,77,44,0.12); border-radius:999px; }
 
-/* Make each tab an inline-flex item that doesn't shrink */
 .tab{
   --pad:10px 14px;
   background:transparent;
@@ -159,42 +130,33 @@ body::after{
   font-size:13px;
   cursor:pointer;
   transition: all 180ms ease;
-  flex: 0 0 auto;          /* don't grow or shrink */
+  flex: 0 0 auto;
   display:inline-flex;
   align-items:center;
   gap:8px;
   position:relative;
   z-index:0;
 }
-
-/* Hover / active styles */
-.tab:hover{
-  transform:none;
-  color:var(--accent);
-  box-shadow: 0 8px 20px rgba(47,143,74,0.06);
-}
+.tab:hover{ transform:none; color:var(--accent); box-shadow: 0 8px 20px rgba(47,143,74,0.06); }
 .tab[aria-selected="true"]{
-  color: #ffffff;
+  color:#fff;
   background: linear-gradient(90deg, var(--accent), var(--accent-2) 120%);
   box-shadow: 0 8px 22px rgba(47,143,74,0.12);
   border: none;
-  z-index:2; /* make active tab appear above neighbors */
+  z-index:2;
 }
-.tab:focus{
-  outline: 3px solid rgba(47,143,74,0.14);
-  outline-offset: 4px;
-  border-radius:999px;
-  z-index:3;
-}
+.tab:focus{ outline: 3px solid rgba(47,143,74,0.14); outline-offset: 4px; border-radius:999px; z-index:3; }
 
-/* Content area */
+/* content area inside card */
 .content{
   min-height:360px;
   background:var(--card);
   border-radius:12px;
   padding:22px;
-  overflow:auto;
+  overflow:auto; /* optional: if you want only .content to scroll instead of entire card, keep this */
   border: 1px solid rgba(18,32,18,0.04);
+  /* If you prefer header+tabs to remain visible while only content scrolls,
+     see the "Sticky header" rules below and change .container overflow to visible. */
 }
 
 /* markdown styling */
@@ -215,7 +177,6 @@ body::after{
 }
 .content ul{ margin-left:1.1rem; color:var(--muted) }
 
-/* loading / misc */
 .loading{ color:var(--muted) }
 
 .site-footer{
@@ -226,15 +187,41 @@ body::after{
   justify-content:flex-end;
 }
 
-/* responsive tweaks */
-@media (max-width:720px){
-  .tabs{ padding-bottom:8px; }
-  .tab{ flex:0 0 auto; }
-  /* Optionally reduce or hide decorative background on small screens */
-  body::before{
-    opacity: calc(var(--global-bg-opacity) * 0.7);
-    background-position: top center;
-    background-size: cover;
-    filter: blur(calc(var(--global-bg-blur) * 1.2));
+/* -------------------------
+   Optional: Sticky header/tabs
+   Uncomment and use this variant if you want the header & tabs to stay fixed
+   at the top of the card while only .content scrolls.
+
+   To use:
+   1) Set .container { overflow: visible; } and .content { max-height: calc(var(--card-height) - <header-tabs-height>); overflow:auto; }
+   2) Apply the sticky rules below (adjust top offsets to match header height)
+--------------------------*/
+
+/*
+.site-header, .tabs {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,250,0.96));
+  z-index: 5;
+}
+*/
+
+/* responsive: on small screens, use fluid width/height instead of fixed card */
+@media (max-width:920px){
+  :root{
+    /* Optionally reduce the preferred size on smaller devices */
+  }
+  .container{
+    width: calc(100% - 48px);
+    height: auto;           /* let height grow, but still clamp via max-height */
+    max-height: calc(100vh - 48px);
+  }
+}
+
+/* responsive: very short viewports — ensure card still fits */
+@media (max-height:640px){
+  .container{
+    height: auto;
+    max-height: calc(100vh - 32px);
   }
 }
