@@ -101,7 +101,7 @@ body::before{
 }
 .site-sub{ margin:4px 0 0 0; color:var(--muted); font-size:13px; }
 
-/* Tabs row */
+/* Tabs row: horizontal scroll, never wrap */
 .tabs{
   display:flex;
   gap:8px;
@@ -153,10 +153,27 @@ body::before{
   background:var(--card);
   border-radius:12px;
   padding:22px;
-  overflow:auto; /* optional: if you want only .content to scroll instead of entire card, keep this */
+  overflow:auto; /* content scrolls internally */
   border: 1px solid rgba(18,32,18,0.04);
-  /* If you prefer header+tabs to remain visible while only content scrolls,
-     see the "Sticky header" rules below and change .container overflow to visible. */
+  /* If you'd rather have header & tabs sticky and only .content scrollable,
+     see the sticky notes at the end of this file. */
+}
+
+/* Video wrapper for responsive embed (Demo tab) */
+.video-wrapper{
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  margin: 8px 0 16px;
+}
+.video-wrapper iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+  border-radius:8px;
 }
 
 /* markdown styling */
@@ -189,15 +206,19 @@ body::before{
 
 /* -------------------------
    Optional: Sticky header/tabs
-   Uncomment and use this variant if you want the header & tabs to stay fixed
-   at the top of the card while only .content scrolls.
-
-   To use:
-   1) Set .container { overflow: visible; } and .content { max-height: calc(var(--card-height) - <header-tabs-height>); overflow:auto; }
-   2) Apply the sticky rules below (adjust top offsets to match header height)
+   If you want header & tabs to remain visible while only content scrolls,
+   do the following:
+   1) Set .container { overflow: visible; } (so sticky elements can escape)
+   2) Set .content { max-height: calc(var(--card-height) - <header-tabs-height>); overflow:auto; }
+   3) Uncomment the sticky rules below and set the correct top offsets.
 --------------------------*/
 
 /*
+.container{ overflow: visible; }
+.content{
+  max-height: calc(var(--card-height) - 110px); // adjust 110px to header+tabs height
+  overflow:auto;
+}
 .site-header, .tabs {
   position: sticky;
   top: 0;
@@ -208,9 +229,6 @@ body::before{
 
 /* responsive: on small screens, use fluid width/height instead of fixed card */
 @media (max-width:920px){
-  :root{
-    /* Optionally reduce the preferred size on smaller devices */
-  }
   .container{
     width: calc(100% - 48px);
     height: auto;           /* let height grow, but still clamp via max-height */
