@@ -1,0 +1,146 @@
+:root{
+  --bg:#0f1720;
+  --card:#0b1220;
+  --muted:#9aa4b2;
+  --accent:#7dd3fc;
+  --glass: rgba(255,255,255,0.03);
+  --radius:12px;
+  --max-width:980px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  background:linear-gradient(180deg,#071025 0%, #081426 60%);
+  color:#e6eef6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+
+  /* Layout changes: align to top and allow scrolling when content is taller than viewport */
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:32px;
+  min-height:100vh;
+  overflow:auto;
+}
+
+.container{
+  width:100%;
+  max-width:var(--max-width);
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:16px;
+  padding:28px;
+  box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  backdrop-filter: blur(6px);
+
+  /* Prevent the card from growing beyond viewport height; make it scroll internally */
+  max-height: calc(100vh - 64px);
+  overflow:auto;
+}
+
+.site-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.site-title{
+  font-size:20px;
+  margin:0;
+  font-weight:600;
+  letter-spacing:0.2px;
+}
+
+.site-sub{
+  margin:4px 0 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* Tabs: never wrap, allow horizontal scroll, smooth scrolling on touch */
+.tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;         /* prevent wrapping */
+  overflow-x:auto;         /* make horizontally scrollable */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;  /* smooth scroll for scrollIntoView */
+  align-items:center;
+  padding-bottom:6px;      /* space under scroll area for touch */
+  margin-bottom:18px;
+}
+
+/* Styling for the scrollbar (subtle) */
+.tabs::-webkit-scrollbar{ height:8px }
+.tabs::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.03);
+  border-radius:999px;
+}
+
+/* Make each tab an inline-flex item that doesn't shrink */
+.tab{
+  --pad:10px 14px;
+  background:transparent;
+  color:var(--muted);
+  border:1px solid transparent;
+  padding:var(--pad);
+  border-radius:999px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  transition: all 180ms ease;
+  flex: 0 0 auto;          /* don't grow or shrink */
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.tab:hover{
+  transform:translateY(-2px);
+  color:var(--accent);
+}
+.tab[aria-selected="true"]{
+  color: #042f40;
+  background: linear-gradient(90deg, var(--accent), #60a5fa 110%);
+  box-shadow: 0 6px 18px rgba(45,212,255,0.08);
+  border: none;
+}
+
+.content{
+  min-height:360px;
+  background:var(--card);
+  border-radius:12px;
+  padding:22px;
+  overflow:auto;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* markdown styling */
+.content h1, .content h2, .content h3{color:#e6f7ff}
+.content h1{font-size:20px;margin-top:0}
+.content p{color:var(--muted);line-height:1.6}
+.content img{max-width:100%;border-radius:8px;display:block;margin:12px 0}
+.content pre{background:#071827;padding:12px;border-radius:8px;overflow:auto}
+.content blockquote{border-left:3px solid rgba(125,211,252,0.14);padding-left:12px;color:var(--muted)}
+.content ul{margin-left:1.1rem;color:var(--muted)}
+
+.loading{color:var(--muted)}
+
+.site-footer{
+  margin-top:18px;
+  color:var(--muted);
+  font-size:13px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+/* responsive tweaks */
+@media (max-width:720px){
+  .tabs{ padding-bottom:8px; }
+  .tab{ flex:0 0 auto; }
+}
